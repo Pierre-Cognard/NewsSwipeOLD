@@ -10,4 +10,5 @@
     <color name="blue_button">#74B9FF</color>
     <color name="blue_button_dark">#00264C</color>
     <color name="bg_button">#30ffffff</color>
+    <color name="bg_card">#40ffffff</color>
 </resources>

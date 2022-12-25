@@ -4,8 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.example.newsswipe.ui.SettingsActivity
-
 
 class SqliteDatabase(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -39,17 +37,17 @@ class SqliteDatabase(context: Context) :
             return storeKeywords
         }
 
-        fun addKeyword(keyword: String, user: String) {
+        fun addKeyword(keyword: String, user: String): Long {
             val values = ContentValues()
             values.put(COLUMN_KEYWORD, keyword)
             values.put(COLUMN_USER, user)
             val db = this.writableDatabase
-            db.insert(TABLE_KEYWORDS, null, values)
+            return db.insert(TABLE_KEYWORDS, null, values)
         }
 
-        fun deleteKeyword(id: Int) {
+        fun deleteKeyword(keyword: String,user: String): Int {
             val db = this.writableDatabase
-            db.delete(TABLE_KEYWORDS, "$COLUMN_ID	= ?", arrayOf(id.toString()))
+            return db.delete(TABLE_KEYWORDS, "$COLUMN_KEYWORD = '$keyword' AND $COLUMN_USER = '$user'",null)
         }
 
         companion object {

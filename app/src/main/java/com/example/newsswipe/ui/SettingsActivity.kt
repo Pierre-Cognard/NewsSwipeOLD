@@ -16,6 +16,7 @@ import com.example.newsswipe.database.SqliteDatabase
 import com.example.newsswipe.ui.adapter.KeywordAdapter
 import com.google.firebase.auth.FirebaseAuth
 
+
 class SettingsActivity : AppCompatActivity() {
 
     private val list = ArrayList<String>()
@@ -23,6 +24,7 @@ class SettingsActivity : AppCompatActivity() {
     private val mAuth = FirebaseAuth.getInstance()
 
     private val user = if(mAuth.currentUser != null){mAuth.currentUser?.email} else{"guest"}
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,17 +39,28 @@ class SettingsActivity : AppCompatActivity() {
         val recyclerView = findViewById<View>(R.id.keyword_recycler_view) as RecyclerView
         //val layoutManager = LinearLayoutManager(this)
         //recyclerView.layoutManager = layoutManager
+        val mAdapter = KeywordAdapter(list,mDatabase,this)
+        recyclerView.adapter = mAdapter
 
 
         addKeywordButton.setOnClickListener {
+            list.drop(1)
+            mAdapter.notifyItemRemoved(2)
+            mAdapter.notifyItemRangeChanged(2, list.size)
             if (keyword.text.toString() == "") {
                 Toast.makeText(this, getString(R.string.error_empty_keyword), Toast.LENGTH_SHORT)
                     .show()
             } else {
-                mDatabase.addKeyword(keyword.text.toString(), user.toString())
-                updateKeywordsList()
+                val check = mDatabase.addKeyword(keyword.text.toString(), user.toString())
+
+                if (check.toInt() == -1){
+                    Toast.makeText(this, getString(R.string.keyword_add_error), Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    Toast.makeText(this, getString(R.string.keyword_add_success), Toast.LENGTH_SHORT).show()
+                    updateKeywordsList()
+                }
                 hideKeyboard()
-                Toast.makeText(this, getString(R.string.keyword_added), Toast.LENGTH_SHORT).show()
             }
             keyword.text = ""
             Log.i("Keyword", list.toString())
@@ -79,8 +92,9 @@ class SettingsActivity : AppCompatActivity() {
         val user = if(mAuth.currentUser != null){mAuth.currentUser?.email} else{"guest"}
         for (elem in mDatabase.findKeywords(user.toString())) list.add(elem)
 
-        val mAdapter = KeywordAdapter(list)
+        val mAdapter = KeywordAdapter(list,mDatabase,this)
         recyclerView.adapter = mAdapter
+
     }
 
     private fun hideKeyboard() {

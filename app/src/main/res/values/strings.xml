@@ -34,9 +34,15 @@
     <string name="add_keyword">Add keyword</string>
     <string name="back_button">Back</string>
     <string name="error_empty_keyword">Error, you have to write a keyword before</string>
-    <string name="keyword_added">keyword added successfully</string>
-    <string name="notification_description">Notification button</string>
-    <string name="delete_description">Delete button</string>
+
+    <string name="keyword_add_error">Error while adding keyword</string>
+    <string name="keyword_add_success">keyword added successfully</string>
+
+    <string name="keyword_delete_error">Error while deleting keyword</string>
+    <string name="keyword_delete_success">keyword successfully deleted</string>
+
+    <string name="notification_description">Notification</string>
+    <string name="delete_description">Delete</string>
 
 
 
