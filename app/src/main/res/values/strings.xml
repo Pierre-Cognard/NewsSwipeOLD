@@ -33,7 +33,9 @@
     <string name="news_language">News language</string>
     <string name="add_keyword">Add keyword</string>
     <string name="back_button">Back</string>
-    <string name="error_empty_keyword">Error, you have to write a keyword before</string>
+
+    <string name="error_empty_keyword">Error, you have to write a keyword before !</string>
+    <string name="error_keyword_already_exist">This keyword is already in the list !</string>
 
     <string name="keyword_add_error">Error while adding keyword</string>
     <string name="keyword_add_success">keyword added successfully</string>

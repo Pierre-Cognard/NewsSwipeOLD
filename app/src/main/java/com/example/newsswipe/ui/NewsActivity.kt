@@ -54,7 +54,7 @@ class NewsActivity : AppCompatActivity() {
         }
 
         searchButton.setOnClickListener{
-            //search()
+            search()
             Log.d("API","search")
         }
     }

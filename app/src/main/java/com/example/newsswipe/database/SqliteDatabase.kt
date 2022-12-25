@@ -19,7 +19,6 @@ class SqliteDatabase(context: Context) :
         }
 
 
-
         fun listKeywords(): MutableList<String> {
             val sql = "select * from $TABLE_KEYWORDS"
             val db = this.readableDatabase
@@ -27,7 +26,7 @@ class SqliteDatabase(context: Context) :
             val cursor = db.rawQuery(sql, null)
             if (cursor.moveToFirst()) {
                 do {
-                    val keyword = cursor.getString(1)
+                    val keyword = cursor.getString(0)
                     val user = cursor.getString(2)
                     storeKeywords.add(keyword)
                     storeKeywords.add(user)

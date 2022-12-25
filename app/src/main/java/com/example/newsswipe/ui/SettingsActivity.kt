@@ -1,5 +1,6 @@
 package com.example.newsswipe.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,17 +20,18 @@ import com.google.firebase.auth.FirebaseAuth
 
 class SettingsActivity : AppCompatActivity() {
 
-    private val list = ArrayList<String>()
+    //private val list = mutableListOf<String>()
     private val mDatabase = SqliteDatabase(this)
     private val mAuth = FirebaseAuth.getInstance()
 
-    private val user = if(mAuth.currentUser != null){mAuth.currentUser?.email} else{"guest"}
+    private val user = if(mAuth.currentUser != null){mAuth.currentUser?.email.toString()} else{"guest"}
 
-
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        val list : MutableList<String> = mDatabase.listKeywords()
         val appLanguageButton = findViewById<Button>(R.id.app_language_button)
         val newsLanguageButton = findViewById<Button>(R.id.news_language_button)
         val addKeywordButton = findViewById<Button>(R.id.add_keyword_button)
@@ -37,33 +39,18 @@ class SettingsActivity : AppCompatActivity() {
         val keyword = findViewById<TextView>(R.id.keyword)
 
         val recyclerView = findViewById<View>(R.id.keyword_recycler_view) as RecyclerView
-        //val layoutManager = LinearLayoutManager(this)
-        //recyclerView.layoutManager = layoutManager
         val mAdapter = KeywordAdapter(list,mDatabase,this)
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = layoutManager
         recyclerView.adapter = mAdapter
 
 
         addKeywordButton.setOnClickListener {
-            list.drop(1)
-            mAdapter.notifyItemRemoved(2)
-            mAdapter.notifyItemRangeChanged(2, list.size)
-            if (keyword.text.toString() == "") {
-                Toast.makeText(this, getString(R.string.error_empty_keyword), Toast.LENGTH_SHORT)
-                    .show()
-            } else {
-                val check = mDatabase.addKeyword(keyword.text.toString(), user.toString())
-
-                if (check.toInt() == -1){
-                    Toast.makeText(this, getString(R.string.keyword_add_error), Toast.LENGTH_SHORT).show()
-                }
-                else{
-                    Toast.makeText(this, getString(R.string.keyword_add_success), Toast.LENGTH_SHORT).show()
-                    updateKeywordsList()
-                }
-                hideKeyboard()
-            }
+            if (keyword.text.toString() == "") Toast.makeText(this, getString(R.string.error_empty_keyword), Toast.LENGTH_SHORT).show() // test if the TextView is empty
+            else if (list.contains(keyword.text.toString())) Toast.makeText(this, getString(R.string.error_keyword_already_exist), Toast.LENGTH_SHORT).show() // test if the keyword already exists
+            else mAdapter.addKeyword(keyword.text.toString())
             keyword.text = ""
-            Log.i("Keyword", list.toString())
+            hideKeyboard()
         }
 
         backButton.setOnClickListener {
@@ -78,26 +65,12 @@ class SettingsActivity : AppCompatActivity() {
         newsLanguageButton.setOnClickListener {
             Log.i("Settings", "News Language")
         }
-        updateKeywordsList()
-    }
-
-
-    private fun updateKeywordsList(){
-
-        val recyclerView = findViewById<View>(R.id.keyword_recycler_view) as RecyclerView
-        val layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = layoutManager
-
         list.clear()
-        val user = if(mAuth.currentUser != null){mAuth.currentUser?.email} else{"guest"}
-        for (elem in mDatabase.findKeywords(user.toString())) list.add(elem)
-
-        val mAdapter = KeywordAdapter(list,mDatabase,this)
-        recyclerView.adapter = mAdapter
-
+        for (elem in mDatabase.findKeywords(user)) list.add(0,elem)
+        mAdapter.notifyDataSetChanged()
     }
 
-    private fun hideKeyboard() {
+    private fun hideKeyboard() { //function to hide the keyboard
         val view: View? = this.currentFocus
         if (view != null) {
             val inputMethodManager =
