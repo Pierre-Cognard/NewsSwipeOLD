@@ -8,10 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsswipe.R
-import com.example.newsswipe.database.SqliteDatabase
 import com.google.firebase.auth.FirebaseAuth
 
-class MyAdapter(private val list: List<String>) : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
+class KeywordAdapter(private val list: List<String>) : RecyclerView.Adapter<KeywordAdapter.ViewHolder>() {
 
     private val mAuth = FirebaseAuth.getInstance()
 

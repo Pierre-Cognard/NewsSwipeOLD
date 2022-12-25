@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsswipe.R
 import com.example.newsswipe.database.SqliteDatabase
-import com.example.newsswipe.ui.adapter.MyAdapter
+import com.example.newsswipe.ui.adapter.KeywordAdapter
 import com.google.firebase.auth.FirebaseAuth
 
 class SettingsActivity : AppCompatActivity() {
@@ -21,6 +21,8 @@ class SettingsActivity : AppCompatActivity() {
     private val list = ArrayList<String>()
     private val mDatabase = SqliteDatabase(this)
     private val mAuth = FirebaseAuth.getInstance()
+
+    private val user = if(mAuth.currentUser != null){mAuth.currentUser?.email} else{"guest"}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,31 +35,17 @@ class SettingsActivity : AppCompatActivity() {
         val keyword = findViewById<TextView>(R.id.keyword)
 
         val recyclerView = findViewById<View>(R.id.keyword_recycler_view) as RecyclerView
-        val layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = layoutManager
+        //val layoutManager = LinearLayoutManager(this)
+        //recyclerView.layoutManager = layoutManager
 
 
         addKeywordButton.setOnClickListener {
-            if (keyword.text.toString() == ""){
-                Toast.makeText(this, getString(R.string.error_empty_keyword), Toast.LENGTH_SHORT).show()
-            }
-            else{
-                //list.add(keyword.text.toString())
-
-                val user: String?
-                if(mAuth.currentUser != null){
-                    user = mAuth.currentUser?.email
-                }
-                else{
-                    user = "guest"
-                }
-
-                mDatabase.addKeyword(keyword.text.toString(),user.toString())
-                list.clear()
-                for (elem in mDatabase.findKeywords(user.toString()))
-                    list.add(elem)
-                val mAdapter = MyAdapter(list)
-                recyclerView.adapter = mAdapter
+            if (keyword.text.toString() == "") {
+                Toast.makeText(this, getString(R.string.error_empty_keyword), Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                mDatabase.addKeyword(keyword.text.toString(), user.toString())
+                updateKeywordsList()
                 hideKeyboard()
                 Toast.makeText(this, getString(R.string.keyword_added), Toast.LENGTH_SHORT).show()
             }
@@ -67,7 +55,6 @@ class SettingsActivity : AppCompatActivity() {
 
         backButton.setOnClickListener {
             val intent = Intent(this, NewsActivity::class.java)
-            //intent.putExtra("mAuth","guest");
             startActivity(intent)
         }
 
@@ -78,29 +65,22 @@ class SettingsActivity : AppCompatActivity() {
         newsLanguageButton.setOnClickListener {
             Log.i("Settings", "News Language")
         }
+        updateKeywordsList()
+    }
 
 
-        val user: String?
+    private fun updateKeywordsList(){
 
-        if(mAuth.currentUser != null){
-            user = mAuth.currentUser?.email
-        }
-        else{
-            user = "guest"
-        }
+        val recyclerView = findViewById<View>(R.id.keyword_recycler_view) as RecyclerView
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = layoutManager
 
-        for (elem in mDatabase.findKeywords(user.toString()))
-            list.add(elem)
+        list.clear()
+        val user = if(mAuth.currentUser != null){mAuth.currentUser?.email} else{"guest"}
+        for (elem in mDatabase.findKeywords(user.toString())) list.add(elem)
 
-        val mAdapter = MyAdapter(list)
+        val mAdapter = KeywordAdapter(list)
         recyclerView.adapter = mAdapter
-
-        Log.i("List Keyword SQL", mDatabase.listKeywords().toString())
-
-        Log.i("List Keyword SQL 2",mDatabase.findKeywords("a@a.fr").toString())
-
-
-
     }
 
     private fun hideKeyboard() {
